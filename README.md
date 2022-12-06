@@ -14,7 +14,7 @@ rover's camera produces
 
 ![image](https://user-images.githubusercontent.com/89746218/205963130-18d953fb-f137-4544-b7fa-65c3de862438.png)
 
-In phase one
+#In phase one
 
 1) pipeline should be able to map at least 40% of the environment at 60% fidelity. It should 
 repaint the map image to distinguish between navigable terrain, obstacles and rock samples
