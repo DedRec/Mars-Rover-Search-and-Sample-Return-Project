@@ -138,20 +138,28 @@ def perception_step(Rover):
     rock_threshed = find_rocks(warped)  # find rock samples
     path_threshed = color_thresh(warped)  # find only the navigatable path
     #  Objective 4
-    Rover.vision_image[:, :, 0] = obs_threshed * 255
-    Rover.vision_image[:, :, 1] = rock_threshed * 255
-    Rover.vision_image[:, :, 2] = path_threshed * 255
+    Rover.vision_image[:, :, 0] = obs_threshed
+    Rover.vision_image[:, :, 1] = rock_threshed
+    Rover.vision_image[:, :, 2] = path_threshed
+    idx = np.nonzero(Rover.vision_image)
+    Rover.vision_image[idx] = 255
+
     #  Objective 5
     xpix_obs, ypix_obs = rover_coords(Rover.vision_image[:, :, 0])
     xpix_rock, ypix_rock = rover_coords(Rover.vision_image[:, :, 1])
     xpix_path, ypix_path = rover_coords(Rover.vision_image[:, :, 2])
+
     #  Objective 6
-    obs_x_world, obs_y_world = pix_to_world(xpix_obs, ypix_obs, Rover.pos[0], Rover.pos[1], Rover.yaw, Rover.worldmap.shape[0],
-                             2*dst_size)
-    rock_x_world, rock_y_world = pix_to_world(xpix_rock, ypix_rock, Rover.pos[0], Rover.pos[1], Rover.yaw, Rover.worldmap.shape[0],
-                              2 * dst_size)
-    navigable_x_world, navigable_y_world = pix_to_world(xpix_path, ypix_path,  Rover.pos[0], Rover.pos[1], Rover.yaw, Rover.worldmap.shape[0],
-                              2 * dst_size)
+    scale = 2*dst_size
+    obs_x_world, obs_y_world = pix_to_world(xpix_obs, ypix_obs,
+                                            Rover.pos[0], Rover.pos[1],
+                                            Rover.yaw, Rover.worldmap.shape[0], scale)
+    rock_x_world, rock_y_world = pix_to_world(xpix_rock, ypix_rock,
+                                              Rover.pos[0], Rover.pos[1],
+                                              Rover.yaw, Rover.worldmap.shape[0], scale)
+    navigable_x_world, navigable_y_world = pix_to_world(xpix_path, ypix_path,
+                                                        Rover.pos[0], Rover.pos[1],
+                                                        Rover.yaw, Rover.worldmap.shape[0], scale)
     # Objective 7
     Rover.worldmap[obs_y_world, obs_x_world, 0] += 1
     Rover.worldmap[rock_y_world, rock_x_world, 1] += 1
