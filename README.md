@@ -1,4 +1,4 @@
-# Computer_Vision_Project
+# Computer Vision Project
 
 In this project, we’ll do computer vision for robotics. 
 We are going to build a Sample & Return Rover in 
@@ -13,3 +13,13 @@ throttle, brake, and steering with each new image the
 rover's camera produces
 
 ![image](https://user-images.githubusercontent.com/89746218/205963130-18d953fb-f137-4544-b7fa-65c3de862438.png)
+
+In phase one
+
+1) pipeline should be able to map at least 40% of the environment at 60% fidelity. It should 
+repaint the map image to distinguish between navigable terrain, obstacles and rock samples
+2) locate at least one rock in the environment
+3) implement debugging mode where each step of your pipeline is 
+illustrated with the vehicle operation
+
+![image](https://user-images.githubusercontent.com/89746218/205963663-9701bec3-f35e-475e-90c4-ee565323905c.png)
