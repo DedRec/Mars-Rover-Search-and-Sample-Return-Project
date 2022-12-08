@@ -33,4 +33,4 @@ Run the following command on cmd
 ```
 python drive_rover.py
 ```
-Then launch the simulator and choose choose "Autonomous Mode", Rover will start by driving itself and showing a map showing navigable terrain, obstacles and rock sample locations
+Then launch the simulator and choose choose "Autonomous Mode", Rover will start by driving itself and showing a map that shows navigable terrain, obstacles and rock sample locations
