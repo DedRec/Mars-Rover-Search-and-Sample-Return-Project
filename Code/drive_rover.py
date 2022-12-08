@@ -16,6 +16,7 @@ import json
 import pickle
 import matplotlib.image as mpimg
 import time
+import keyboard
 
 # Import functions for perception and decision making
 from perception import perception_step
@@ -52,6 +53,7 @@ class RoverState():
         self.nav_angles = None # Angles of navigable terrain pixels
         self.nav_dists = None # Distances of navigable terrain pixels
         self.ground_truth = ground_truth_3d # Ground truth worldmap
+        self.debug = 0 # Debugging mode enable
         self.mode = 'forward' # Current mode (can be forward or stop)
         self.throttle_set = 0.2 # Throttle setting when accelerating
         self.brake_set = 10 # Brake setting when braking
@@ -105,7 +107,11 @@ def telemetry(sid, data):
         global Rover
         # Initialize / update Rover with current telemetry
         Rover, image = update_rover(Rover, data)
-
+        if keyboard.is_pressed('m'):
+            if Rover.debug == 0:
+                Rover.debug = 1
+            else:
+                Rover.debug = 0
         if np.isfinite(Rover.vel):
 
             # Execute the perception and decision steps to update the Rover's state
@@ -185,15 +191,16 @@ def send_pickup():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remote Driving')
     parser.add_argument(
-        'image_folder',
+        '../IMG_RUN', #'image_folder'
         type=str,
         nargs='?',
         default='',
         help='Path to image folder. This is where the images from the run will be saved.'
     )
     args = parser.parse_args()
+    args.image_folder = '../IMG_RUN'
     
-    #os.system('rm -rf IMG_stream/*')
+    os.system('rm -rf IMG_stream/*')
     if args.image_folder != '':
         print("Creating image folder at {}".format(args.image_folder))
         if not os.path.exists(args.image_folder):
