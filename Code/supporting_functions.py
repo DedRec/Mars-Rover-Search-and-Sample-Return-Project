@@ -74,7 +74,8 @@ def update_rover(Rover, data):
 # Define a function to create display output given worldmap results
 def create_output_images(Rover):
     # Create a scaled map for plotting and clean up obs/nav pixels a bit
-    if Rover.debug != 1:
+    if Rover.debug != 1: # Check if debugging mode was enabled
+        # Debugging mode was not enabled so display statistical images
         if np.max(Rover.worldmap[:, :, 2]) > 0:
             nav_pix = Rover.worldmap[:, :, 2] > 0
             navigable = Rover.worldmap[:, :, 2] * (255 / np.mean(Rover.worldmap[nav_pix, 2]))
@@ -159,6 +160,8 @@ def create_output_images(Rover):
         pil_img.save(buff, format="JPEG")
         encoded_string2 = base64.b64encode(buff.getvalue()).decode("utf-8")
     else:
+        # Debugging mode was enabled
+        # Show pipeline images
         dst_size = 5
         bottom_offset = 6
         source = np.float32([[19, 140],
@@ -172,8 +175,12 @@ def create_output_images(Rover):
                                    Rover.img.shape[0] - dst_size * 2 - bottom_offset],
                                   [Rover.img.shape[1] / 2 - dst_size, Rover.img.shape[0] - dst_size * 2 - bottom_offset]
                                   ])
+        # Generate Warped image
         warped = perspect_transform(Rover.img, source, destination, kernel_size=3)
+        # Generate Colored Threshed image
         path_threshed = color_thresh_color_img(warped)
+
+        # Generate Rover-centric Coords image
         threshed = color_thresh(warped)
         xpix, ypix = rover_coords(threshed)
         dist, angles = to_polar_coords(xpix, ypix)
@@ -187,8 +194,9 @@ def create_output_images(Rover):
         y_arrow = arrow_length * np.sin(mean_dir)
         plt.arrow(0, 0, x_arrow, y_arrow, color='red', zorder=2, head_width=10, width=2)
 
+        # Vertically concatenate Warped and Colored Threshed image to be a single image
         m_h = cv2.vconcat([warped, path_threshed])
-
+        # Convert Warped, Threshed, and Rover-centric Coords images to base64 strings for sending to server
         pil_img = Image.fromarray(m_h.astype(np.uint8))
         buff = BytesIO()
         pil_img.save(buff, format="JPEG")

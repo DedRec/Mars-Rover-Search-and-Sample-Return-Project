@@ -40,7 +40,7 @@ ground_truth_3d = np.dstack((ground_truth*0, ground_truth*255, ground_truth*0)).
 class RoverState():
     def __init__(self):
         self.start_time = None # To record the start time of navigation
-        self.total_time = None # To record total duration of naviagation
+        self.total_time = None # To record total duration of navigation
         self.img = None # Current camera image
         self.pos = None # Current position (x, y)
         self.yaw = None # Current yaw angle
@@ -53,14 +53,13 @@ class RoverState():
         self.nav_angles = None # Angles of navigable terrain pixels
         self.nav_dists = None # Distances of navigable terrain pixels
         self.ground_truth = ground_truth_3d # Ground truth worldmap
-        self.debug = 0 # Debugging mode enable
+        self.debug = 0 # Debugging mode enable initially disabled
         self.mode = 'forward' # Current mode (can be forward or stop)
         self.throttle_set = 0.2 # Throttle setting when accelerating
         self.brake_set = 10 # Brake setting when braking
         # The stop_forward and go_forward fields below represent total count
         # of navigable terrain pixels.  This is a very crude form of knowing
-        # when you can keep going and when you should stop.  Feel free to
-        # get creative in adding new fields or modifying these!
+        # when you can keep going and when you should stop.
         self.stop_forward = 50 # Threshold to initiate stopping
         self.go_forward = 500 # Threshold to go forward again
         self.max_vel = 2 # Maximum velocity (meters/second)
@@ -73,7 +72,7 @@ class RoverState():
         # obstacles and rock samples
         self.worldmap = np.zeros((200, 200, 3), dtype=np.float) 
         self.samples_pos = None # To store the actual sample positions
-        self.samples_to_find = 0 # To store the initial count of samples
+        self.samples_to_find = 6 # To store the initial count of samples
         self.samples_located = 0 # To store number of samples located on map
         self.samples_collected = 0 # To count the number of samples collected
         self.near_sample = 0 # Will be set to telemetry value data["near_sample"]
@@ -191,13 +190,14 @@ def send_pickup():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remote Driving')
     parser.add_argument(
-        '../IMG_RUN', #'image_folder'
+        'image_folder', #'image_folder'
         type=str,
         nargs='?',
         default='',
         help='Path to image folder. This is where the images from the run will be saved.'
     )
     args = parser.parse_args()
+    # Specify destination folder to save into
     args.image_folder = '../IMG_RUN'
     
     os.system('rm -rf IMG_stream/*')
