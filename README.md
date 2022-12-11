@@ -29,7 +29,7 @@ In code file you will find python files needed, drive_rover.py is needed to navi
 it also calls functions from within perception.py and decision.py.
 Everything in the jupyter notebook is defined in perception.py
 
-Run the following command on cmd 
+Run the following command on linux terminal 
 this command will aid to use the keyboard library for debugging mode
 ```
 su root
