@@ -30,7 +30,14 @@ it also calls functions from within perception.py and decision.py.
 Everything in the jupyter notebook is defined in perception.py
 
 Run the following command on cmd 
+this command will aid to use the keyboard library for debugging mode
+```
+su root
+```
+then
 ```
 python drive_rover.py
 ```
-Then launch the simulator and choose choose "Autonomous Mode", Rover will start by driving itself and showing a map that shows navigable terrain, obstacles and rock sample locations
+Then launch the simulator and choose choose "Autonomous Mode", Rover will start by driving itself and showing a map that shows navigable terrain, obstacles and rock 
+sample locations, to view debugging mode where each step of the pipeline is illustrated with the vehicle operation
+click on letter 'm'
