@@ -41,3 +41,14 @@ python drive_rover.py
 Then launch the simulator and choose choose "Autonomous Mode", Rover will start by driving itself and showing a map that shows navigable terrain, obstacles and rock 
 sample locations, to view debugging mode where each step of the pipeline is illustrated with the vehicle operation
 click on letter 'm'
+
+##Debugging mode 
+![image](https://user-images.githubusercontent.com/89746218/206920089-a868fdc6-fbd9-48b6-98fb-43eb9f19f8bb.png)
+
+##Mapping
+![image](https://user-images.githubusercontent.com/89746218/206920139-ad4c6c45-3a39-43ec-ba51-bcf9670af4d2.png)
+
+![image](https://user-images.githubusercontent.com/89746218/206920122-957b4868-ba46-4f97-877c-b78cab61acc9.png)
+
+
+
