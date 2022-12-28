@@ -39,10 +39,13 @@ ground_truth_3d = np.dstack((ground_truth*0, ground_truth*255, ground_truth*0)).
 # Define RoverState() class to retain rover state parameters
 class RoverState():
     def __init__(self):
+        self.gold_flag = False # if he sees gold he marks this as true
         self.start_time = None # To record the start time of navigation
         self.total_time = None # To record total duration of navigation
         self.img = None # Current camera image
         self.pos = None # Current position (x, y)
+        self.pos_prev = (0,0) # Current position (x, y)
+        self.pos_count = 0 # Current position (x, y) how long have i been in the same pos
         self.yaw = None # Current yaw angle
         self.pitch = None # Current pitch angle
         self.roll = None # Current roll angle
@@ -56,13 +59,13 @@ class RoverState():
         self.debug = 0 # Debugging mode enable initially disabled
         self.mode = 'forward' # Current mode (can be forward or stop)
         self.throttle_set = 0.2 # Throttle setting when accelerating
-        self.brake_set = 10 # Brake setting when braking
+        self.brake_set = 25 # Brake setting when braking
         # The stop_forward and go_forward fields below represent total count
         # of navigable terrain pixels.  This is a very crude form of knowing
         # when you can keep going and when you should stop.
-        self.stop_forward = 50 # Threshold to initiate stopping
+        self.stop_forward = 30 # Threshold to initiate stopping
         self.go_forward = 500 # Threshold to go forward again
-        self.max_vel = 2 # Maximum velocity (meters/second)
+        self.max_vel = 2.4 # Maximum velocity (meters/second)
         # Image output from perception step
         # Update this image to display your intermediate analysis steps
         # on screen in autonomous mode
@@ -78,7 +81,10 @@ class RoverState():
         self.near_sample = 0 # Will be set to telemetry value data["near_sample"]
         self.picking_up = 0 # Will be set to telemetry value data["picking_up"]
         self.send_pickup = False # Set to True to trigger rock pickup
-# Initialize our rover 
+        self.backward_timer = 0 # timer to go back after picking up a stone
+        self.steer_count = 0 # timer to go back after picking up a stone how long have i been on the same steering angle
+        self.steer_prev = 0 # timer to go back after picking up a stone
+# Initialize our rover
 Rover = RoverState()
 
 # Variables to track frames per second (FPS)
