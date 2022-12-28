@@ -174,8 +174,8 @@ def perception_step(Rover):
     '''
     Rover.worldmap[rock_y_world, rock_x_world, 1] += 1
     Rover.worldmap[obs_y_world, obs_x_world, 0] += 1
-    roll_limit = 0.4  ## 3shan el medan ele fel nos 0.55
-    pitch_limit = 0.4 ## 3shan el medan ele fel nos 0.55
+    roll_limit = 0.35  ## 3shan el medan ele fel nos 0.55
+    pitch_limit = 0.35 ## 3shan el medan ele fel nos 0.55
     if (Rover.roll < roll_limit or Rover.roll > 360 - roll_limit) and (Rover.pitch < pitch_limit or Rover.pitch > 360 - pitch_limit):
         Rover.worldmap[navigable_y_world, navigable_x_world, 2] += 1
 
