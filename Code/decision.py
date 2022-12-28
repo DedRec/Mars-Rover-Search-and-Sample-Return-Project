@@ -1,19 +1,89 @@
+import random
 import numpy as np
 
-
-# This is where you can build a decision tree for determining throttle, brake and steer 
+# This is where you can build a decision tree for determining throttle, brake and steer
 # commands based on the output of the perception_step() function
-def decision_step(Rover):
+
+
+
+
+
+def decision_step(Rover):   # checks if the position is nearly is the same as prev position
+    def same_pos():
+        if (abs(Rover.pos[0] - Rover.pos_prev[0]) < 0.01) and (abs(Rover.pos[1] - Rover.pos_prev[1]) < 0.01) and Rover.mode == "forward":
+            return True
+        else :
+            return False
+
+
+    print(Rover.steer_count , "steer count")
+    print(Rover.pos_count , "POS count")
+    print(Rover.mode , "mode")
+    ###STUCK ########################################
+    if same_pos():
+        Rover.pos_count +=1
+    else :
+        Rover.pos_count =0
+
+    Rover.pos_prev = Rover.pos
+    if(Rover.pos_count >= 50) :
+        r = random.randint(0, 9) # if stuck try different moves
+        if r >=5 :
+            Rover.mode = "pickedUp"
+        else :
+            Rover.mode = "stop"
+
+        Rover.pos_count = 0
+
+    ###########POS END#######################################
+    #####STERING FOR TOO LONG #############
+    upper = Rover.steer_prev + 3
+    lower = Rover.steer_prev - 3
+    if (Rover.steer >= lower) and (Rover.steer <= upper) and (Rover.steer > 10 or Rover.steer < -10) and not Rover.rock_flag and Rover.mode == "forward":
+        if Rover.mode != 'pickedUp':
+            Rover.steer_count += 1
+    else:
+        Rover.steer_count = 0
+
+    if (Rover.steer_count >= 200) : ####better 250 needs to be tried ;;;;;;;;;;
+        Rover.steer_count = 0
+        Rover.brake = 20
+        Rover.steer = -15
+        Rover.mode = "pickedUp"
+    Rover.steer_prev = Rover.steer
+
+    Rover.rock_flag  = False
+
+    #####STERING END ###############################
 
     # Implement conditionals to decide what to do given perception data
     # Here you're all set up with some basic functionality but you'll need to
     # improve on this decision tree to do a good job of navigating autonomously!
 
+
     # Example:
     # Check if we have vision data to make decisions with
+
     if Rover.nav_angles is not None:
         # Check for Rover.mode status
-        if Rover.mode == 'forward': 
+
+        if Rover.mode == 'pickedUp': # i just picked up a rock and probably facing a wall # 1e4 is estimated to be 1 second
+            print("i just picked up")
+            Rover.steer = -5             #bid5ol fel kol el amaken el day2a + bigarab amaken gdeda
+            Rover.throttle = - 0.3
+            Rover.brake = 0
+            print("going backward pep pep...")
+            if Rover.picking_up == 0 :
+                Rover.backward_timer += 1
+                print("increasing")
+            print("Timer values",Rover.backward_timer)
+
+            if Rover.backward_timer > int(68 * 1.3) :
+                Rover.mode = 'forward'
+                Rover.brake = 10
+                Rover.backward_timer = 0
+
+        elif Rover.mode == 'forward':
             # Check the extent of navigable terrain
             if len(Rover.nav_angles) >= Rover.stop_forward:  
                 # If mode is forward, navigable terrain looks good 
@@ -34,6 +104,8 @@ def decision_step(Rover):
                     Rover.brake = Rover.brake_set
                     Rover.steer = 0
                     Rover.mode = 'stop'
+
+
 
         # If we're already in "stop" mode then make different decisions
         elif Rover.mode == 'stop':
@@ -60,6 +132,7 @@ def decision_step(Rover):
                     # Set steer to mean angle
                     Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
                     Rover.mode = 'forward'
+
     # Just to make the rover do something 
     # even if no modifications have been made to the code
     else:
@@ -68,19 +141,23 @@ def decision_step(Rover):
         Rover.brake = 0
     
     
-    
     if Rover.near_sample:
+        Rover.rock_flag = True
         Rover.throttle = 0
-        Rover.brake = 15
+        Rover.brake = 20
         Rover.steer = 0
 
+
     elif len(Rover.rocks_angles) > 0:
-	    Rover.throttle = 0.1
-	    Rover.steer = np.clip(np.mean(Rover.rocks_angles * 180 / np.pi), -15, 15)
-    
+        Rover.rock_flag = True
+        Rover.throttle = 0.07
+        Rover.steer = np.clip(np.mean(Rover.rocks_angles * 180 / np.pi), -15, 15)
+
+
     # If in a state where want to pickup a rock send pickup command
     if Rover.near_sample and Rover.vel == 0 and not Rover.picking_up:
         Rover.send_pickup = True
-    
+        Rover.mode = "pickedUp"
+
     return Rover
 
