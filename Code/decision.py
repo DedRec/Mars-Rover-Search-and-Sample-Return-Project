@@ -9,6 +9,8 @@ import numpy as np
 
 
 def decision_step(Rover):   # checks if the position is nearly is the same as prev position
+
+    print("ROVER MODE " ,Rover.mode)
     def same_pos():
         if (abs(Rover.pos[0] - Rover.pos_prev[0]) < 0.01) and (abs(Rover.pos[1] - Rover.pos_prev[1]) < 0.01) and Rover.mode == "forward":
             return True
@@ -27,11 +29,12 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
 
     Rover.pos_prev = Rover.pos
     if(Rover.pos_count >= 50) :
-        r = random.randint(0, 9) # if stuck try different moves
+        r = random.randint(0, 10) # if stuck try different moves
         if r >=5 :
             Rover.mode = "pickedUp"
         else :
-            Rover.mode = "stop"
+            Rover.mode = "rotate" ##should be the stop mode where it rotate
+            #seif change
 
         Rover.pos_count = 0
 
@@ -104,6 +107,21 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
                     Rover.brake = Rover.brake_set
                     Rover.steer = 0
                     Rover.mode = 'stop'
+
+
+        elif Rover.mode == "rotate":
+            r = random.randint(0, 1)  # if stuck try different moves
+            Rover.throttle = 0
+            # Release the brake to allow turning
+            Rover.brake = 0
+            # Turn range is +/- 15 degrees, when stopped the next line will induce 4-wheel turning
+            Rover.steer = (-1*r) * 15  # Could be more clever here about which way to turn -1/1
+            Rover.rotate_timer +=1
+            if(Rover.rotate_timer >= 120)  :
+                Rover.rortate_timer = 0
+
+                Rover.mode = "forward"  ##should be the stop mode where it rotate
+
 
 
 
