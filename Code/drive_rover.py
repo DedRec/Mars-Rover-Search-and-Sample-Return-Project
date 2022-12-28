@@ -40,6 +40,7 @@ ground_truth_3d = np.dstack((ground_truth*0, ground_truth*255, ground_truth*0)).
 class RoverState():
     def __init__(self):
         self.gold_flag = False # if he sees gold he marks this as true
+        self.rotate_timer = 0 # rotating timer
         self.start_time = None # To record the start time of navigation
         self.total_time = None # To record total duration of navigation
         self.img = None # Current camera image
