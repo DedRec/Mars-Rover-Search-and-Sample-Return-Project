@@ -56,7 +56,7 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
         Rover.mode = "pickedUp"
     Rover.steer_prev = Rover.steer
 
-    Rover.rock_flag  = False
+    Rover.gold_flag  = False
 
     #####STERING END ###############################
 
