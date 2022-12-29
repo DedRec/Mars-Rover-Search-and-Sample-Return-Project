@@ -167,7 +167,7 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
         Rover.steer = 0
 
 
-    elif len(Rover.rocks_angles) > 0:
+    if len(Rover.rocks_angles) > 0:
         Rover.gold_flag = True
         Rover.throttle = 0.07
         Rover.steer = np.clip(np.mean(Rover.rocks_angles * 180 / np.pi), -15, 15)
