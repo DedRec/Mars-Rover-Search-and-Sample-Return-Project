@@ -92,7 +92,7 @@ def pix_to_world(xpix, ypix, xpos, ypos, yaw, world_size, scale):
 
 # Define a function to perform a perspective transform
 def perspect_transform(img, src, dst, kernel_size=3):
-    img = cv2.GaussianBlur(img, (kernel_size, kernel_size), 0)
+    #img = cv2.GaussianBlur(img, (kernel_size, kernel_size), 0)
     M = cv2.getPerspectiveTransform(src, dst)
     warped = cv2.warpPerspective(img, M, (img.shape[1], img.shape[0]))  # keep same size as input image
     mask = cv2.warpPerspective(np.ones_like(img[:,:,0]), M, (img.shape[1], img.shape[0]))
