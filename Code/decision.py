@@ -44,7 +44,7 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
     #####STERING FOR TOO LONG #############
     upper = Rover.steer_prev + 2
     lower = Rover.steer_prev - 2
-    if (Rover.steer >= lower) and (Rover.steer <= upper) and (Rover.steer > 10 or Rover.steer < -10) and not Rover.rock_flag and Rover.mode == "forward":
+    if (Rover.steer >= lower) and (Rover.steer <= upper) and (Rover.steer > 10 or Rover.steer < -10) and not Rover.gold_flag and Rover.mode == "forward":
         if Rover.mode != 'pickedUp':
             Rover.steer_count += 1
     else:
