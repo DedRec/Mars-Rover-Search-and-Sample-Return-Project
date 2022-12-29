@@ -10,7 +10,7 @@ import numpy as np
 
 def decision_step(Rover):   # checks if the position is nearly is the same as prev position
 
-    print("ROVER MODE " ,Rover.mode)
+    #print("ROVER MODE " ,Rover.mode)
     def same_pos():
         if (abs(Rover.pos[0] - Rover.pos_prev[0]) < 0.01) and (abs(Rover.pos[1] - Rover.pos_prev[1]) < 0.01) and Rover.mode == "forward":
             return True
@@ -18,17 +18,19 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
             return False
 
 
-    print(Rover.steer_count , "steer count")
-    print(Rover.pos_count , "POS count")
-    print(Rover.mode , "mode")
+    #print(Rover.steer_count , "steer count")
+    #print(Rover.pos_count , "POS count")
+    #print(Rover.mode , "mode")
     ###STUCK ########################################
+
+
     if same_pos():
         Rover.pos_count +=1
     else :
         Rover.pos_count =0
 
     Rover.pos_prev = Rover.pos
-    if(Rover.pos_count >= 50) :
+    if(Rover.pos_count >= Rover.max_pos_count) :
         r = random.randint(0, 10) # if stuck try different moves
         if r >=5 :
             Rover.mode = "pickedUp"
@@ -40,15 +42,15 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
 
     ###########POS END#######################################
     #####STERING FOR TOO LONG #############
-    upper = Rover.steer_prev + 3
-    lower = Rover.steer_prev - 3
+    upper = Rover.steer_prev + 2
+    lower = Rover.steer_prev - 2
     if (Rover.steer >= lower) and (Rover.steer <= upper) and (Rover.steer > 10 or Rover.steer < -10) and not Rover.rock_flag and Rover.mode == "forward":
         if Rover.mode != 'pickedUp':
             Rover.steer_count += 1
     else:
         Rover.steer_count = 0
 
-    if (Rover.steer_count >= 200) : ####better 250 needs to be tried ;;;;;;;;;;
+    if (Rover.steer_count >= Rover.max_steer_count) : ####better 250 needs to be tried ;;;;;;;;;;
         Rover.steer_count = 0
         Rover.brake = 20
         Rover.steer = -15
@@ -71,15 +73,15 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
         # Check for Rover.mode status
 
         if Rover.mode == 'pickedUp': # i just picked up a rock and probably facing a wall # 1e4 is estimated to be 1 second
-            print("i just picked up")
+            #print("i just picked up")
             Rover.steer = -5             #bid5ol fel kol el amaken el day2a + bigarab amaken gdeda
             Rover.throttle = - 0.3
             Rover.brake = 0
-            print("going backward pep pep...")
+            #print("going backward pep pep...")
             if Rover.picking_up == 0 :
                 Rover.backward_timer += 1
-                print("increasing")
-            print("Timer values",Rover.backward_timer)
+            #    print("increasing")
+            #print("Timer values",Rover.backward_timer)
 
             if Rover.backward_timer > int(68 * 1.3) :
                 Rover.mode = 'forward'
@@ -160,14 +162,14 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
     
     
     if Rover.near_sample:
-        Rover.rock_flag = True
+        Rover.gold_flag = True
         Rover.throttle = 0
         Rover.brake = 20
         Rover.steer = 0
 
 
     elif len(Rover.rocks_angles) > 0:
-        Rover.rock_flag = True
+        Rover.gold_flag = True
         Rover.throttle = 0.07
         Rover.steer = np.clip(np.mean(Rover.rocks_angles * 180 / np.pi), -15, 15)
 
