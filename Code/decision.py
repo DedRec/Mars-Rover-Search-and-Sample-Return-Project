@@ -1,6 +1,10 @@
 import random
 import numpy as np
-
+places = [ {"center" : (48,94) , "radius" :40 , "partially_visited" : False ,"totally_visited" : False}
+    , {"center" : (118,40) , "radius" : 40, "partially_visited" : False ,"totally_visited" : False},
+    {"center" : (155,100) , "radius" :20 , "partially_visited" : False ,"totally_visited" : False},
+           {"center": (115, 153), "radius":41 , "partially_visited": False, "totally_visited": False}
+    ]
 # This is where you can build a decision tree for determining throttle, brake and steer
 # commands based on the output of the perception_step() function
 
