@@ -16,14 +16,50 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
             return True
         else :
             return False
+   def check_partially_visiting():
+        #mark visited
+        x,y = Rover.pos
+        for place in places :
+            upperx = place["center"][0] + place["radius"]
+            lowerx = place["center"][0] - place["radius"]
+            uppery = place["center"][1] + place["radius"]
+            lowery = place["center"][1] - place["radius"]
+            if(x>=lowerx and x<= upperx and y>= lowery and y<=uppery):
+                place["partially_visited"] = True
+    def check_totally_visited() :
+        x,y = Rover.pos
+        for place in places :
+            upperx = place["center"][0] + place["radius"]
+            lowerx = place["center"][0] - place["radius"]
+            uppery = place["center"][1] + place["radius"]
+            lowery = place["center"][1] - place["radius"]
+            if not(x>=lowerx and x<= upperx and y>= lowery and y<=uppery) and place["partially_visited"]:
+                place["totally_visited"] = True
+        pass
+    def check_if_inside_visited() :
+        #rotate 180 and go forward for 0.5 seconds
+        x,y = Rover.pos
+        for place in places :
+            upperx = place["center"][0] + place["radius"]
+            lowerx = place["center"][0] - place["radius"]
+            uppery = place["center"][1] + place["radius"]
+            lowery = place["center"][1] - place["radius"]
+            if (x>=lowerx and x<= upperx and y>= lowery and y<=uppery) and place["totally_visited"]:
+                Rover.mode = "scared"
+                return True
 
+
+ 
 
     #print(Rover.steer_count , "steer count")
     #print(Rover.pos_count , "POS count")
     #print(Rover.mode , "mode")
     ###STUCK ########################################
 
-
+    check_partially_visiting()
+    check_if_inside_visited()
+    check_totally_visited()
+    
     if same_pos():
         Rover.pos_count +=1
     else :
@@ -122,6 +158,36 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
                 Rover.rortate_timer = 0
 
                 Rover.mode = "forward"  ##should be the stop mode where it rotate
+                
+        elif Rover.mode == "jump_scare": #just saw the devil
+            if Rover.vel == 0:
+                Rover.mode = "scared"
+                return Rover
+            else :
+                Rover.brake = 15
+                Rover.throttle = 0
+                # Release the brake to allow turning
+
+
+        elif Rover.mode == "scared" : # rotate to run
+            Rover.throttle = 0
+            # Release the brake to allow turning
+            Rover.brake = 0
+            # Turn range is +/- 15 degrees, when stopped the next line will induce 4-wheel turning
+            Rover.steer = (-1 * r) * 15  # Could be more clever here about which way to turn -1/1
+            Rover.rotate_timer += 1
+            if (Rover.rotate_timer >= 130): #rotate 1 degres
+                Rover.rortate_timer = 0
+                Rover.mode = "run"
+                return Rover
+
+        elif Rover.mode == "run": #keep going until out
+            Rover.throttle = 3
+            if not check_if_inside_visited() :
+                Rover.mode = "stop"
+            return Rover
+
+
 
 
 
