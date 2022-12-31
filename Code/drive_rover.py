@@ -41,10 +41,12 @@ ground_truth_3d = np.dstack((ground_truth * 0, ground_truth * 255, ground_truth 
 # Define RoverState() class to retain rover state parameters
 class RoverState():
     def __init__(self):
-        self.toggle = False  # used when stuck
+        self.toggle = 0  # used when stuck
         self.first_yaw = 0  # used when stuck
-        self.visited = []  # used when stuck
-        self.t_visited = []  # used when stuck
+        self.rot_yaw = 0  # used when stuck
+        self.visited = 0  # used when stuck
+        self.p_vis = []  # used for visited
+        self.t_vis = []  # used when stuck
         self.gold_flag = False  # if he sees gold he marks this as true
         self.rotate_timer = 0  # rotating timer
         self.start_time = None  # To record the start time of navigation
@@ -53,7 +55,7 @@ class RoverState():
         self.pos = None  # Current position (x, y)
         self.pos_prev = (0, 0)  # Current position (x, y)
         self.pos_count = 0  # Current position (x, y) how long have i been in the same pos
-        self.yaw = None  # Current yaw angle
+        self.yaw = 0  # Current yaw angle
         self.pitch = None  # Current pitch angle
         self.roll = None  # Current roll angle
         self.vel = None  # Current velocity
@@ -133,6 +135,12 @@ def telemetry(sid, data):
             # Execute the perception and decision steps to update the Rover's state
             Rover = perception_step(Rover)
             Rover = decision_step(Rover)
+            str_cnt = int((Rover.steer_count / Rover.max_steer_count) * 15)
+            pos_cnt = int((Rover.pos_count / Rover.max_pos_count) * 15)
+            print(
+                f"\r |steer count |{str_cnt * '█' + '-' * (15 - str_cnt)}|  |pos count| {pos_cnt * '▮' + '▯' * (15 - pos_cnt)} |rock_found| {int(Rover.gold_flag == True) * '⚫'} |mode| {Rover.mode} |P_Visited| {Rover.p_vis} |t_Visited| {Rover.t_vis} |total visits| {Rover.visited}",
+                end="\r", flush=True)
+
 
             # Create output images to send to server
             out_image_string1, out_image_string2 = create_output_images(Rover)
