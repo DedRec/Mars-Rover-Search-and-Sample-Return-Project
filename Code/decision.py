@@ -2,19 +2,16 @@ import random
 import numpy as np
 
 places = [
-    {"center": (35, 94), "radius": 40, "partially_visited": False, "totally_visited": False, "number": "dark blue",
+    {"center": (35, 94), "radius": 35, "partially_visited": False, "totally_visited": False, "number": "red",
      "yaw": 330.1},
-    {"center": (118, 35), "radius": 40, "partially_visited": False, "totally_visited": False, "number": "purple",
+    {"center": (118, 35), "radius": 35, "partially_visited": False, "totally_visited": False, "number": "yellow",
      "yaw": 160.1},
-    {"center": (77, 71), "radius": 5, "partially_visited": False, "totally_visited": False, "number": "grey",
-     "yaw": 30.1},
-    {"center": (155, 100), "radius": 10, "partially_visited": False, "totally_visited": False, "number": "pale green",
-     "yaw": 310.1},
-    {"center": (115, 165), "radius": 50, "partially_visited": False, "totally_visited": False, "number": "yellow",
+    {"center": (115, 165), "radius": 40, "partially_visited": False, "totally_visited": False, "number": "blue",
+     "yaw": 210.1},
+    {"center": (152, 100), "radius": 17, "partially_visited": False, "totally_visited": False, "number": "green",
      "yaw": 210.1}
-    ]
 
-
+]
 # This is where you can build a decision tree for determining throttle, brake and steer
 # commands based on the output of the perception_step() function
 
@@ -29,10 +26,13 @@ def decision_step(Rover):  # checks if the position is nearly is the same as pre
         else:
             return False
 
-    if Rover.visited >= 4:
+    if len(Rover.t_vis) >=3:
         for place in places:
-            place["partially_visited"] = place["totally_visited"] = False
-        Rover.visited = 0
+            place["partially_visited"] = False
+            place["totally_visited"] = False
+        Rover.p_vis = []
+        Rover.t_vis = []
+        print("most visited")
 
     def check_partially_visiting():
         # mark visited
@@ -58,6 +58,7 @@ def decision_step(Rover):  # checks if the position is nearly is the same as pre
                 place["totally_visited"] = True
                 if place["number"] not in Rover.t_vis:
                     Rover.t_vis.append(place["number"])
+                    Rover.visited+=1
 
     def check_if_inside_visited():
         # rotate 180 and go forward for 0.5 seconds
@@ -180,16 +181,14 @@ def decision_step(Rover):  # checks if the position is nearly is the same as pre
 
 
         elif Rover.mode == "rotate":
-            r = random.randint(0, 1)  # if stuck try different moves
+            r = random.randint(-2, 2)  # if stuck try different moves
             Rover.throttle = 0
             # Release the brake to allow turning
             Rover.brake = 0
             # Turn range is +/- 15 degrees, when stopped the next line will induce 4-wheel turning
-            Rover.steer = (-1 * r) * 15  # Could be more clever here about which way to turn -1/1
-            Rover.rotate_timer += 1
-            if ( abs(Rover.yaw - Rover.rot_yaw) >= 170) :
+            Rover.steer = -15  # Could be more clever here about which way to turn -1/1
+            if ( abs(Rover.yaw - Rover.rot_yaw) >= (120 + (-r * (30))) ) :
                 Rover.mode = "forward"  ##should be the stop mode where it rotate
-            return Rover
 
 
         elif Rover.mode == "jump_scare":  # just saw the devil
@@ -199,13 +198,14 @@ def decision_step(Rover):  # checks if the position is nearly is the same as pre
                 Rover.first_yaw = Rover.yaw
                 return Rover
             else:
-                Rover.brake = 10
+                Rover.brake = 15
                 Rover.throttle = 0
                 # Release the brake to allow turning
 
 
         elif Rover.mode == "scared":  # rotate to run
             # Release the brake to allow turning
+            r = random.randint(-2, 2)  # if stuck try different moves
             Rover.brake = 0
             Rover.throttle = 0
             # Turn range is +/- 15 degrees, when stopped the next line will induce 4-wheel turning
@@ -214,7 +214,7 @@ def decision_step(Rover):  # checks if the position is nearly is the same as pre
             Rover.brake = 0
             Rover.throttle = 0
             # if (abs(Rover.yaw-yaw) <= 2): #rotate 180 degres till equal yaw
-            if (abs((Rover.yaw - Rover.first_yaw)) <= 15):  # rotate till = place["yaw"]
+            if (abs((Rover.yaw - Rover.first_yaw)) >= (159 + 10*r)):  # rotate till = place["yaw"]
                 Rover.mode = "run"
             return Rover
 
