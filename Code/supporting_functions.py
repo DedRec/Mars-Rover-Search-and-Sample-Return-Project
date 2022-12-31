@@ -21,10 +21,7 @@ def convert_to_float(string_to_convert):
 
 
 def update_rover(Rover, data):
-    str_cnt = int ((Rover.steer_count / Rover.max_steer_count) * 15)
-    pos_cnt = int((Rover.pos_count /  Rover.max_pos_count) * 15)
-    print(f"\r|steer count |{str_cnt * '█' + '-' * (15 - str_cnt)}  |pos count| {pos_cnt * '▮' + '▯' * (15 - pos_cnt)} |rock_found| {int(Rover.gold_flag == True)* '⚫'} |mode| {Rover.mode}  ",
-        end="\r", flush=True)
+
 
     # Initialize start time and sample positions
     if Rover.start_time == None:
