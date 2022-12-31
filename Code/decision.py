@@ -1,69 +1,79 @@
 import random
 import numpy as np
 
-'''places = [ {"center" : (48,94) , "radius" :40 , "partially_visited" : False ,"totally_visited" : False}
-    , {"center" : (118,40) , "radius" : 40, "partially_visited" : False ,"totally_visited" : False},
-    {"center" : (155,100) , "radius" :20 , "partially_visited" : False ,"totally_visited" : False},
-           {"center": (115, 153), "radius":41 , "partially_visited": False, "totally_visited": False}
-    ]'''
+places = [
+    {"center": (35, 94), "radius": 40, "partially_visited": False, "totally_visited": False, "number": "dark blue",
+     "yaw": 330.1},
+    {"center": (118, 35), "radius": 40, "partially_visited": False, "totally_visited": False, "number": "purple",
+     "yaw": 160.1},
+    {"center": (77, 71), "radius": 5, "partially_visited": False, "totally_visited": False, "number": "grey",
+     "yaw": 30.1},
+    {"center": (155, 100), "radius": 10, "partially_visited": False, "totally_visited": False, "number": "pale green",
+     "yaw": 310.1},
+    {"center": (115, 165), "radius": 50, "partially_visited": False, "totally_visited": False, "number": "yellow",
+     "yaw": 210.1}
+    ]
+
+
 # This is where you can build a decision tree for determining throttle, brake and steer
 # commands based on the output of the perception_step() function
-places = [ {"equ": (-83,0)  ,"partially_visited" : False ,"totally_visited" : False},
-           {"equ": (0,-65)  ,"partially_visited" : False ,"totally_visited" : False},
-           {"equ": (0,115)  ,"partially_visited" : False ,"totally_visited" : False} # dont forget to multiply by negative
-           ]
 
 
+def decision_step(Rover):  # checks if the position is nearly is the same as prev position
 
-
-def decision_step(Rover):   # checks if the position is nearly is the same as prev position
-
-    #print("ROVER MODE " ,Rover.mode)
+    # print("ROVER MODE " ,Rover.mode)
     def same_pos():
-        if (abs(Rover.pos[0] - Rover.pos_prev[0]) < 0.01) and (abs(Rover.pos[1] - Rover.pos_prev[1]) < 0.01) and Rover.mode == "forward":
+        if (abs(Rover.pos[0] - Rover.pos_prev[0]) < 0.01) and (
+                abs(Rover.pos[1] - Rover.pos_prev[1]) < 0.01) and Rover.mode == "forward":
             return True
-        else :
+        else:
             return False
+
+    if Rover.visited >= 4:
+        for place in places:
+            place["partially_visited"] = place["totally_visited"] = False
+        Rover.visited = 0
+
     def check_partially_visiting():
-        #mark visited
-        x,y = Rover.pos
-        equ= [0,0,0]
-        equ[0] = places[0]["equ"][0] + x
-        equ[1] = places[0]["equ"][1] + y
-        equ[2] = places[0]["equ"][0] - y
-        for i in range(3):
-            if(equ[i]<=0):
-                places[i]["partially_visited"] = True
-                if i not in Rover.visited :
-                    Rover.visited.append(i)
-    def check_totally_visited() :
+        # mark visited
         x, y = Rover.pos
-        equ = [0, 0, 0]
-        equ[0] = places[0]["equ"][0] + x
-        equ[1] = places[0]["equ"][1] + y
-        equ[2] = places[0]["equ"][0] - y
-        for i in range(3):
-            if (equ[i] > 0) and places[i]["partially_visited"]:
-                places[i]["totally_visited"] = True
-                if i not in Rover.t_visited:
-                    Rover.t_visited.append(i)
-        pass
-    def check_if_inside_visited() :
-        #rotate 180 and go forward for 0.5 seconds
-        x,y = Rover.pos
-        equ = [0, 0, 0]
-        equ[0] = places[0]["equ"][0] + x
-        equ[1] = places[0]["equ"][1] + y
-        equ[2] = places[0]["equ"][0] - y
-        for i in range(3):
-            if(equ[0]<=0) and places[i]["totally_visited"] :
-                return True
+        for place in places:
+            upperx = place["center"][0] + place["radius"]
+            lowerx = place["center"][0] - place["radius"]
+            uppery = place["center"][1] + place["radius"]
+            lowery = place["center"][1] - place["radius"]
+            if (x >= lowerx and x <= upperx and y >= lowery and y <= uppery):
+                place["partially_visited"] = True
+                if place["number"] not in Rover.p_vis:
+                    Rover.p_vis.append(place["number"])
 
- 
+    def check_totally_visited():
+        x, y = Rover.pos
+        for place in places:
+            upperx = place["center"][0] + place["radius"]
+            lowerx = place["center"][0] - place["radius"]
+            uppery = place["center"][1] + place["radius"]
+            lowery = place["center"][1] - place["radius"]
+            if not (x >= lowerx and x <= upperx and y >= lowery and y <= uppery) and place["partially_visited"]:
+                place["totally_visited"] = True
+                if place["number"] not in Rover.t_vis:
+                    Rover.t_vis.append(place["number"])
 
-    #print(Rover.steer_count , "steer count")
-    #print(Rover.pos_count , "POS count")
-    #print(Rover.mode , "mode")
+    def check_if_inside_visited():
+        # rotate 180 and go forward for 0.5 seconds
+        x, y = Rover.pos
+        for place in places:
+            upperx = place["center"][0] + place["radius"]
+            lowerx = place["center"][0] - place["radius"]
+            uppery = place["center"][1] + place["radius"]
+            lowery = place["center"][1] - place["radius"]
+            if (x >= lowerx and x <= upperx and y >= lowery and y <= uppery) and place["totally_visited"]:
+                return place["yaw"] + 1.0
+        return False
+
+    # print(Rover.steer_count , "steer count")
+    # print(Rover.pos_count , "POS count")
+    # print(Rover.mode , "mode")
     ###STUCK ########################################
 
     check_partially_visiting()
@@ -72,41 +82,45 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
     if Rover.mode == "forward" and check_if_inside_visited():
         Rover.mode = "jump_scare"
 
-
     if same_pos():
-        Rover.pos_count +=1
-    else :
-        Rover.pos_count =0
+        Rover.pos_count += 1
+    else:
+        Rover.pos_count = 0
 
     Rover.pos_prev = Rover.pos
-    if(Rover.pos_count >= Rover.max_pos_count) :
-        Rover.toggle = not Rover.toggle
-        r = random.randint(0, 10) # if stuck try different moves
-        if Rover.toggle :
-            Rover.mode = "pickedUp"
-        else :
-            Rover.mode = "rotate" ##should be the stop mode where it rotate
-            #seif change
+    if (Rover.pos_count >= Rover.max_pos_count):
+
+        Rover.toggle += 1
+        print("fffffff", Rover.toggle)
+        print("fffffff22", Rover.toggle%2)
+        if Rover.toggle % 2 == 0:
+            Rover.mode = "reverse"
+        else:
+            Rover.rot_yaw = Rover.yaw
+            Rover.mode = "rotate"  ##should be the stop mode where it rotate
+            # seif change
 
         Rover.pos_count = 0
+        return Rover
 
     ###########POS END#######################################
     #####STERING FOR TOO LONG #############
     upper = Rover.steer_prev + 2
     lower = Rover.steer_prev - 2
-    if (Rover.steer >= lower) and (Rover.steer <= upper) and (Rover.steer > 10 or Rover.steer < -10) and not Rover.gold_flag and Rover.mode == "forward":
+    if (Rover.steer >= lower) and (Rover.steer <= upper) and (
+            Rover.steer > 10 or Rover.steer < -10) and not Rover.gold_flag and Rover.mode == "forward":
         Rover.steer_count += 1
     else:
         Rover.steer_count = 0
 
-    if (Rover.steer_count >= Rover.max_steer_count) : ####better 250 needs to be tried ;;;;;;;;;;
+    if (Rover.steer_count >= Rover.max_steer_count):  ####better 250 needs to be tried ;;;;;;;;;;
         Rover.steer_count = 0
         Rover.brake = 15
         Rover.steer = -15
-        Rover.mode = "pickedUp"
+        Rover.mode = "reverse"
     Rover.steer_prev = Rover.steer
 
-    Rover.gold_flag  = False
+    Rover.gold_flag = False
 
     #####STERING END ###############################
 
@@ -114,50 +128,55 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
     # Here you're all set up with some basic functionality but you'll need to
     # improve on this decision tree to do a good job of navigating autonomously!
 
-
     # Example:
     # Check if we have vision data to make decisions with
-
+    Rover.throttle = Rover.throttle_set
     if Rover.nav_angles is not None:
         # Check for Rover.mode status
 
-        if Rover.mode == 'pickedUp': # i just picked up a rock and probably facing a wall # 1e4 is estimated to be 1 second
-            #print("i just picked up")
-            Rover.steer = 0             #bid5ol fel kol el amaken el day2a + bigarab amaken gdeda
+        if Rover.mode == 'reverse':  # i just picked up a rock and probably facing a wall # 1e4 is estimated to be 1 second
+            # print("i just picked up")
+            Rover.steer = 0  # bid5ol fel kol el amaken el day2a + bigarab amaken gdeda
             Rover.throttle = - 0.1
             Rover.brake = 0
-            #print("going backward pep pep...")
-            if Rover.picking_up == 0 :
+            # print("going backward pep pep...")
+            if Rover.picking_up == 0:
                 Rover.backward_timer += 1
             #    print("increasing")
-            #print("Timer values",Rover.backward_timer)
+            # print("Timer values",Rover.backward_timer)
 
-            if Rover.backward_timer > int(80) :
+            if Rover.backward_timer > int(80):
                 Rover.mode = 'forward'
                 Rover.brake = 15
                 Rover.backward_timer = 0
 
         elif Rover.mode == 'forward':
             # Check the extent of navigable terrain
-            if len(Rover.nav_angles) >= Rover.stop_forward:  
+            if len(Rover.nav_angles) >= Rover.stop_forward:
                 # If mode is forward, navigable terrain looks good 
                 # and velocity is below max, then throttle 
                 if Rover.vel < Rover.max_vel:
                     # Set throttle value to throttle setting
                     Rover.throttle = Rover.throttle_set
-                else: # Else coast
+                else:  # Else coast
                     Rover.throttle = 0
                 Rover.brake = 0
                 # Set steering to average angle clipped to the range +/- 15
-                Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
+                Rover.steer = np.clip(np.mean(Rover.nav_angles * 180 / np.pi), -15, 15)
             # If there's a lack of navigable terrain pixels then go to 'stop' mode
             elif len(Rover.nav_angles) < Rover.stop_forward:
-                    # Set mode to "stop" and hit the brakes!
-                    Rover.throttle = 0
-                    # Set brake to stored brake value
-                    Rover.brake = Rover.brake_set
-                    Rover.steer = 0
-                    Rover.mode = 'stop'
+                # Set mode to "stop" and hit the brakes!
+                Rover.throttle = 0
+                # Set brake to stored brake value
+                Rover.brake = Rover.brake_set
+                Rover.steer = 0
+                Rover.mode = 'stop'
+
+            if abs(Rover.steer) >= 13:
+                Rover.throttle = 0.1
+            else:
+                Rover.throttle = Rover.throttle_set
+
 
 
         elif Rover.mode == "rotate":
@@ -166,46 +185,47 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
             # Release the brake to allow turning
             Rover.brake = 0
             # Turn range is +/- 15 degrees, when stopped the next line will induce 4-wheel turning
-            Rover.steer = (-1*r) * 15  # Could be more clever here about which way to turn -1/1
-            Rover.rotate_timer +=1
-            if(Rover.rotate_timer >= 120)  :
-                Rover.rortate_timer = 0
-
+            Rover.steer = (-1 * r) * 15  # Could be more clever here about which way to turn -1/1
+            Rover.rotate_timer += 1
+            if ( abs(Rover.yaw - Rover.rot_yaw) >= 170) :
                 Rover.mode = "forward"  ##should be the stop mode where it rotate
-                
+            return Rover
 
-        elif Rover.mode == "jump_scare": #just saw the devil
+
+        elif Rover.mode == "jump_scare":  # just saw the devil
             if Rover.vel == 0:
+                Rover.throttle = 0
                 Rover.mode = "scared"
                 Rover.first_yaw = Rover.yaw
                 return Rover
-            else :
-                Rover.brake = 15
+            else:
+                Rover.brake = 10
                 Rover.throttle = 0
                 # Release the brake to allow turning
 
 
-        elif Rover.mode == "scared" : # rotate to run
-            Rover.throttle = 0
+        elif Rover.mode == "scared":  # rotate to run
             # Release the brake to allow turning
             Rover.brake = 0
+            Rover.throttle = 0
             # Turn range is +/- 15 degrees, when stopped the next line will induce 4-wheel turning
-            Rover.steer = 15  # Could be more clever here about which way to turn -1/1
-            if (abs(Rover.yaw-Rover.first_yaw) >= 180): #rotate 180 degres
-                Rover.mode = "run"
-                return Rover
-
-        elif Rover.mode == "run": #keep going until out
-            Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -8, 8)
+            Rover.steer = -15  # Could be more clever here about which way to turn -1/1
+            yaw2 = check_if_inside_visited()
             Rover.brake = 0
-            Rover.throttle = 0.3
-            if not check_if_inside_visited() :
-                Rover.mode = "forward"
+            Rover.throttle = 0
+            # if (abs(Rover.yaw-yaw) <= 2): #rotate 180 degres till equal yaw
+            if (abs((Rover.yaw - Rover.first_yaw)) <= 15):  # rotate till = place["yaw"]
+                Rover.mode = "run"
             return Rover
 
+        elif Rover.mode == "run":  # keep going until out
 
-
-
+            Rover.steer = np.clip(np.mean(Rover.nav_angles * 180 / np.pi), -8, 8)
+            Rover.brake = 0
+            Rover.throttle = 0.1
+            if not check_if_inside_visited():
+                Rover.mode = "forward"
+            return Rover
 
 
         # If we're already in "stop" mode then make different decisions
@@ -223,7 +243,7 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
                     # Release the brake to allow turning
                     Rover.brake = 0
                     # Turn range is +/- 15 degrees, when stopped the next line will induce 4-wheel turning
-                    Rover.steer = -15 # Could be more clever here about which way to turn
+                    Rover.steer = -15  # Could be more clever here about which way to turn
                 # If we're stopped but see sufficient navigable terrain in front then go!
                 if len(Rover.nav_angles) >= Rover.go_forward:
                     # Set throttle back to stored value
@@ -231,7 +251,7 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
                     # Release the brake
                     Rover.brake = 0
                     # Set steer to mean angle
-                    Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
+                    Rover.steer = np.clip(np.mean(Rover.nav_angles * 180 / np.pi), -15, 15)
                     Rover.mode = 'forward'
 
     # Just to make the rover do something 
@@ -240,8 +260,7 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
         Rover.throttle = Rover.throttle_set
         Rover.steer = 0
         Rover.brake = 0
-    
-    
+
     if Rover.near_sample:
         Rover.gold_flag = True
         Rover.throttle = 0
@@ -251,14 +270,12 @@ def decision_step(Rover):   # checks if the position is nearly is the same as pr
 
     elif len(Rover.rocks_angles) > 0:
         Rover.gold_flag = True
-        Rover.throttle = 0.07
+        Rover.throttle = 0.1
         Rover.steer = np.clip(np.mean(Rover.rocks_angles * 180 / np.pi), -15, 15)
-
 
     # If in a state where want to pickup a rock send pickup command
     if Rover.near_sample and Rover.vel == 0 and not Rover.picking_up:
         Rover.send_pickup = True
-        Rover.mode = "pickedUp"
+        Rover.mode = "reverse"
 
     return Rover
-
