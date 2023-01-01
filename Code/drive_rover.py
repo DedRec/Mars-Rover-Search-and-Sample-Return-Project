@@ -72,7 +72,7 @@ class RoverState():
         # The stop_forward and go_forward fields below represent total count
         # of navigable terrain pixels.  This is a very crude form of knowing
         # when you can keep going and when you should stop.
-        self.stop_forward = 50  # Threshold to initiate stopping
+        self.stop_forward = 90  # Threshold to initiate stopping
         self.go_forward = 500  # Threshold to go forward again
         self.max_vel = 1.8  # Maximum velocity (meters/second)
         # Image output from perception step

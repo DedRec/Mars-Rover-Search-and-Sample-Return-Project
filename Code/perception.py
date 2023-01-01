@@ -20,7 +20,8 @@ def color_thresh_decision(img, rgb_thresh=(180, 170, 160)):
 # Identify pixels above the threshold
 # Threshold of RGB > 160 does a nice job of identifying ground pixels only
 def color_thresh(img, rgb_thresh=(180, 170, 160)):
-    # img = cv2.GaussianBlur(img, (3, 3), 0)
+    img = cv2.GaussianBlur(img, (7, 7), 0)
+    # img = cv2.add(gimg, img)
     # Create an array of zeros same xy size as img, but single channel
     color_select = np.zeros_like(img[:, :, 0])
     # Require that each pixel be above all three threshold values in RGB
@@ -214,8 +215,8 @@ def perception_step(Rover):
         Rover.worldmap[navigable_y_world, navigable_x_world, 2] += 1
     '''
 
-    roll_limit = 0.3  ## 3shan el medan ele fel nos 0.55
-    pitch_limit = 0.3 ## 3shan el medan ele fel nos 0.55
+    roll_limit = 0.35  ## 3shan el medan ele fel nos 0.55
+    pitch_limit = 0.35 ## 3shan el medan ele fel nos 0.55
     if (Rover.roll < roll_limit or Rover.roll > 360 - roll_limit) and (Rover.pitch < pitch_limit or Rover.pitch > 360 - pitch_limit):
         Rover.worldmap[rock_y_world, rock_x_world, 1] += 1
         Rover.worldmap[obs_y_world, obs_x_world, 0] += 1
