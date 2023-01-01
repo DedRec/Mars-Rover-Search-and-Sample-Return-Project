@@ -1,4 +1,5 @@
 # Do the necessary imports
+from  simple_pid import PID
 import argparse
 import shutil
 import base64
@@ -96,6 +97,8 @@ class RoverState():
 
         self.max_steer_count= 200
         self.max_pos_count = 40
+
+        self.pid = PID(0.5, 0.1, 0)
 
 
 # Initialize our rover
