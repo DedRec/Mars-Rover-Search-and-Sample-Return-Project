@@ -118,7 +118,7 @@ def perspect_transform(img, src, dst):
     return warped, mask
 
 # Define a function to identify rocks
-def find_rocks(img,Rock_thresh_low=(100,100,0),Rock_thresh_high=(210,210,55)):
+def find_rocks(img,Rock_thresh_low=(100,100,0),Rock_thresh_high=(255,255,55)):
 
     color_select = cv2.inRange(img,Rock_thresh_low,Rock_thresh_high)
 
