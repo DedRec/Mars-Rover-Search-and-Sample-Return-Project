@@ -1,4 +1,4 @@
-# Rover Autonomous Navigation Project
+# Mars-Rover-Search-and-Sample-Return-Project
 
 ## Introduction
 This project aims to develop an autonomous navigation system for a rover using perception and decision-making algorithms. The rover's goal is to navigate through an environment, avoiding obstacles, locating rock samples, and collecting them.
