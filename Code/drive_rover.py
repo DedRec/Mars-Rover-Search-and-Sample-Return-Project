@@ -41,6 +41,10 @@ ground_truth_3d = np.dstack((ground_truth * 0, ground_truth * 255, ground_truth 
 # Define RoverState() class to retain rover state parameters
 class RoverState():
     def __init__(self):
+        self.toggle = False  # used when stuck
+        self.first_yaw = 0  # used when stuck
+        self.visited = []  # used when stuck
+        self.t_visited = []  # used when stuck
         self.gold_flag = False  # if he sees gold he marks this as true
         self.rotate_timer = 0  # rotating timer
         self.start_time = None  # To record the start time of navigation
@@ -88,7 +92,7 @@ class RoverState():
         self.steer_count = 0  # timer to go back after picking up a stone how long have i been on the same steering angle
         self.steer_prev = 0  # timer to go back after picking up a stone
 
-        self.max_steer_count= 150
+        self.max_steer_count= 200
         self.max_pos_count = 40
 
 
